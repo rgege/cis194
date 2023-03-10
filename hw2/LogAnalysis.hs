@@ -36,3 +36,30 @@ insert m (Node f t a)
   | (getTimeStamp m) < (getTimeStamp t) = Node (insert m f) t a
   | otherwise                           = Node f t (insert m a)
 
+-- Exercise 3.
+
+build :: [LogMessage] -> MessageTree
+build = foldr insert Leaf
+
+-- Exercise 4.
+
+inOrder :: MessageTree -> [LogMessage]
+inOrder Leaf         = []
+inOrder (Node f m a) = inOrder f ++ [m] ++ inOrder a
+
+-- Exercise 5.
+
+whatWentWrong :: [LogMessage] -> [String]
+whatWentWrong = map getString . inOrder . build . filter getSeverity . filter getError
+  where
+    getString (LogMessage _ _ s) = s
+    getString (Unknown _)        = ""
+    getError (LogMessage (Error _) _ _) = True
+    getError _                          = False
+    getSeverity (LogMessage (Error n) _ _) = n > 50
+    getSeverity _                          = False
+
+-- Exercise 6.
+
+iCan :: IO [String]
+iCan = testWhatWentWrong parse whatWentWrong "error.log"
