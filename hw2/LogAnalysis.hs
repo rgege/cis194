@@ -22,3 +22,17 @@ parse = go . lines
   where
     go []     = []
     go (x:xs) = parseMessage x : go xs
+
+-- Exercise 2.
+
+getTimeStamp :: LogMessage -> TimeStamp
+getTimeStamp (Unknown _)        = (-1)
+getTimeStamp (LogMessage _ t _) = t
+
+insert :: LogMessage -> MessageTree -> MessageTree
+insert (Unknown _) t = t
+insert m Leaf = Node Leaf m Leaf
+insert m (Node f t a)
+  | (getTimeStamp m) < (getTimeStamp t) = Node (insert m f) t a
+  | otherwise                           = Node f t (insert m a)
+
